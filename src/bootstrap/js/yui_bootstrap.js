@@ -3,24 +3,18 @@
  *
  * @module bootstrap
  */
-
-/**
- * Provides YUI_bootstrap methods.
- *
- * @class YUI_bootstrap
- * @static
- */
 (function() {
 	
-	var _config = null;
+	var _config = null,
+		_loaderQueue = [];
    	
 	/**
      * YUI_bootstrap function.  If YUI_bootstrap is already defined, the
-     * existing YUI_bootstrap functino will not be overwritten to preserve
+     * existing YUI_bootstrap function will not be overwritten to preserve
      * the state of the bootstrap.
      *
      * @class YUI_bootstrap
-     * @constructor
+     * @static
      * @global
      * @param o Optional configuration object.  Options:
      * <ul>
@@ -86,11 +80,64 @@
      *  <li>modules:
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
      * </ul>
+     * 
+     * Final Note: 
+     * The first time this function get invoked, it will set the "o" as the default configuration 
+     * object for succesive calls without the "o" argument. 
+     * 
+     * Also, we can pass a custom argument thru "o" to customize
+     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
+     * define a custom COMBO url to load a default set of components including loader in a single entry.
      */
+	
+	/**
+	 * Dispatch the first element from the job queue 
+	 * @method _loaderDispatch
+	 * @private
+	 * @static
+	 * @return void
+	 */
+	function _loaderDispatch () {
+		var c;
+		if ((c = _loaderQueue.pop())) {
+			c.call();
+		}
+	}
+	
+	/**
+	 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
+	 * from the queue
+	 * @method _includeLoader
+	 * @private
+	 * @static
+	 * @return void
+	 */
+	function _includeLoader () {
+		/* injecting the YUI Loader in the current page */
+	    var seed = _config.seed || 'http://yui.yahooapis.com/3.0.0pr2/build/yui/yui-min.js',
+			s = document.createElement('script'),
+			fn = function(){
+				if ((typeof YUI === 'undefined') || !YUI || YUI.Loader) {
+					// keep waiting...
+					window.setTimeout(fn, 50);
+				} else {	  
+					// YUI is ready...
+					window.setTimeout(_loaderDispatch, 1);
+				}
+		    };
+	    s.setAttribute('type', 'text/javascript');
+	    s.setAttribute('src', seed);
+	    document.getElementsByTagName('head')[0].appendChild(s);
+		fn();
+	}
+	
 	YUI_bootstrap = function (o) {
 		
 		// analyzing "o"
 		o = o || _config || {};
+		
+		// storing the first config
+		_config = _config || o;
 		
 		return {
 			/**
@@ -100,29 +147,20 @@
 		     * the instance has the required functionality.  If included, it
 		     * must be the last parameter.
 		     *
-		     * YUI_bootstrap().use('dd')
+		     * YUI_bootstrap().use('dd', callback)
 		     *
 		     * @return void
 		     */
 			use: function () {
-				var Y = YUI(o);
-				Y.use.apply (Y, arguments);
-			},
-			/**
-		     * Set the default configuration for the loader.
-		     * @param o {object} default configuration object for the bootstrap, 
-		     * basically "o" can be used to define the global configuration once in 
-		     * your application, instead of including the configuration for each single 
-		     * bootstrap call.
-		     *
-		     * YUI_bootstrap(o).setAsDefault()
-		     *
-		     * @return void
-		     */
-			setAsDefault: function (o) {
-				if (o) {
-					_config = o || {};
-				}
+				var a=Array.prototype.slice.call(arguments, 0);
+				_loaderQueue.push (function () {
+					var Y = YUI(o);
+					Y.use.apply (Y, a);
+					_loaderDispatch(); // dispatching the rest of the waiting jobs
+				});
+				// verifying if the loader is ready in the page, if not, it will be 
+				// included automatically and then the process will continue.
+				((typeof YUI === 'undefined' || !YUI)?_includeLoader():_loaderDispatch());
 			}
 		};
 	};

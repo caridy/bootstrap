@@ -14,13 +14,11 @@
 		</div>
 
     </div>
-	<!-- YUI3 Core //-->
-	<script type="text/javascript" src="../../../../yui3/build/yui/yui-debug.js"></script>
-	<!-- Scripts to test //-->
+	<!-- Bootstrap Script //-->
 	<script type="text/javascript" src="../../../build/bootstrap/bootstrap-debug.js"></script>
 	<!-- Initialization process //-->
 	<script type="text/javascript">
-		YUI({
+		YUI_bootstrap({
 		    base:'../../../../yui3/build/',
 		    filter: 'debug',
 		    logExclude:{
@@ -46,18 +44,17 @@
 				
 				test_bootstrap_init_process: function(){
 					
-					var foo = false;
+					var foo = true;
 					
-					YAHOO_bootstrap({
-					    filter: 'debug'
-					}).use('dom', function () {
+					YUI_bootstrap().use('dd', function () {
 						foo = true;
 					});
 					
 					// waiting for the loading of all the requirements
 					this.wait(function(){ 
-		                Y.Assert.areEqual(foo, true, "was great...");
+		                Y.Assert.areEqual(foo, true, "the loading process fail");
 		            }, 1000);
+					
 				}
 				
 			})); 
