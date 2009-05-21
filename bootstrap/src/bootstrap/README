@@ -1,1 +1,8 @@
-YUI 2.x Boostrap Object
+YUI 2.x Bootstrap Object:
+-------------------------
+Namespace: YAHOO_bootstrap
+
+
+YUI 3.x Bootstrap Object:
+-------------------------
+Namespace: YUI_bootstrap
