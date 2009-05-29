@@ -175,14 +175,36 @@
 		}
 	}
 	
+	/**
+	 * Verify if the current configuration object just defines new modules. If that's the case, 
+	 * we will use "_config" as the computed configuration, and "o" as the list of modules to add.
+	 * @method _getConf
+	 * @param o currrent configuration object
+	 * @private
+	 * @static
+	 * @return object computed configuration
+	 */
+	function _getConf(o) {
+		var m = (o||{}).modules || {}, 
+			flag = true, i;
+		if (m) {
+		  for (i in m) {
+		  	if (m.hasOwnProperty(i) && (i != 'modules')) {
+		  		flag = false;
+		  	}
+		  }
+		}
+		return ((o && flag)?o:(_config||{}));
+	}
+	
 	YAHOO_bootstrap = function (o) {
-		
+		console.log (o);
+		// modules that should be added
+		var m = (o||{}).modules || {};
+		console.log (m);
 		// analyzing "o"
-		o = o || _config || {};
-		
-		// storing the first config
-		_config = _config || o;
-		
+		o = _getConf(o);
+		console.log (o, 'f');
 		return {
 			/**
 		     * Load a set of modules and notify thru the callback method.
@@ -199,7 +221,13 @@
 				var a=Array.prototype.slice.call(arguments, 0),
 					callback = a.pop ();
 				_loaderQueue.push (function () {
+					var i;
 					_initLoader(o);
+					for (i in m) {
+						if (m.hasOwnProperty(i)) {
+							_loaderObj.addModule(m[i]);
+						}
+					}
 					_loaderObj.require(a);
 					_loaderObj.insert({
 						onSuccess: function () {
@@ -220,6 +248,23 @@
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
 				((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch());
+			},
+			/**
+		     * Setting the default configuration object. It will set the "o" as the default configuration 
+		     * object for succesive calls without the "o" argument. 
+		     * 
+		     * Also, we can pass a custom argument thru "o" to customize
+		     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
+		     * define a custom COMBO url to load a default set of components including loader in a single entry.
+		     * 
+		     * YUI_bootstrap(o).init()
+		     *
+		     * @return void
+		     */
+			init: function () {
+				// verifying if the loader is ready in the page, if not, it will be 
+				// included automatically and then the process will continue.
+				_config = (_config?_config:(o||{}));
 			}
 		};
 	};
