@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+	<title>Test Page</title>
+	<!-- Bootstrap Script //-->
+	<script type="text/javascript" src="../build/bootstrap/bootstrap-debug.js"></script>
+	<!-- Initialization process //-->
+	<script type="text/javascript">
+		// initialization (optional)
+		YAHOO_bootstrap({
+		    base:'../../yui2/build/',
+			seed: 'yuiloader/yuiloader-debug.js',
+			filter: 'debug',
+			loadOptional: true, 
+			combine: false,
+			modules: {
+				'foo': {
+					fullpath: './yui2-foo.js',
+					requires: ['event']
+				}
+			}
+		}, true);
+	</script>
+</head>
+<body class="yui-skin-sam">
+	
+    <div id="doc">
+
+		<div id="demo">
+			<div class="hd"><h3 class="title">H3 - Title</h3></div>
+			<div class="bd">
+				<p>&nbsp;</p>
+			</div>
+		</div>
+
+    </div>
+	
+	<script type="text/javascript">
+		// First Block: using YUI 2.x modules
+		YAHOO_bootstrap().use('event', 'dom', 'connection', function (Y) {
+		    alert ('First Block: Ready...');
+		});
+	</script>
+
+	<script type="text/javascript">
+		// Second Block: combining YUI 2.x modules with a custom module defined in the initialization
+		YAHOO_bootstrap().use('event', 'dom', 'json', 'foo', function (Y) {
+		    alert ('Second Block: Ready...');
+		});		
+	</script>
+		
+	<script type="text/javascript">
+		// Third Block: combining YUI 2.x modules with a custom module defined inline
+		YAHOO_bootstrap({
+			modules: {
+				'bar': {
+					fullpath: './yui2-bar.js',
+					requires: ['tabview']
+				}
+			}
+		}).use('animation', 'bar', function (Y) {
+		    alert ('Third Block: Ready...');
+		});		
+	</script>
+</body>
+</html>
