@@ -1,8 +1,6 @@
 /** 
  * Provides Bootstrap definition based on YUI 2.x.
  *
- * ---
- *
  * @module bootstrap
  */
 (function() {
@@ -84,20 +82,12 @@
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
      * </ul>
      * 
-     * Final Note: 
-     * The first time this function get invoked, it will set the "o" as the default configuration 
-     * object for succesive calls without the "o" argument. 
-     * 
      * Also, we can pass a custom argument thru "o" to customize
      * the file that should be injected to define the YUI Loader Utility. This feature allow us to
      * define a custom COMBO url to load a default set of components including loader in a single entry.
+     * 
      * @param boolean def if true, "o" will be used as the default configuration object for succesive 
      * calls without the "o" argument.
-     * 
-     * Also, we can pass a custom argument thru "o" to customize
-     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-     * define a custom COMBO url to load a default set of components including loader in a single entry.
-     * 
      * 
 	 */
 	
@@ -228,7 +218,6 @@
 		o = _getConf(o);
 		// if def is true, o will be used as the default config from now on 
 		_config = (def?o:_config);
-		//console.log (o, _config, 'f');
 		return {
 			/**
 		     * Load a set of modules and notify thru the callback method.
@@ -267,7 +256,7 @@
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
 				if (_loaderQueue.length===1) {
-					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch(true));				
+					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch());				
 				}
 			}
 		};

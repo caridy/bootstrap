@@ -2,8 +2,28 @@
 <html>
 <head>
 	<title>Test Page</title>
+	<!-- Bootstrap Script //-->
+	<script type="text/javascript" src="../build/bootstrap/bootstrap-debug.js"></script>
+	<!-- Initialization process //-->
+	<script type="text/javascript">
+		// initialization (optional)
+		YUI_bootstrap({
+		    base:'../../yui3/build/',
+			seed: 'yui/yui-debug.js',
+			filter: 'debug',
+			loadOptional: true, 
+			combine: false,
+			modules: {
+				'foo': {
+					fullpath: './yui3-foo.js',
+					requires: ['node']
+				}
+			}
+		}, true);
+	</script>
 </head>
 <body class="yui-skin-sam">
+	
     <div id="doc">
 
 		<div id="demo">
@@ -14,58 +34,33 @@
 		</div>
 
     </div>
-	<!-- Bootstrap Script //-->
-	<script type="text/javascript" src="../build/bootstrap/bootstrap-debug.js"></script>
-	<!-- Initialization process //-->
+
 	<script type="text/javascript">
+		// First Block: using YUI 3.x modules
+		YUI_bootstrap().use('event', 'node', 'array', function (Y) {
+		    alert ('First Block: Ready...');
+		});
+	</script>
+
+	<script type="text/javascript">
+		// Second Block: combining YUI 3.x modules with a custom module defined in the initialization
+		YUI_bootstrap().use('node', 'dd', 'foo', function (Y) {
+		    alert ('Second Block: Ready...');
+		});		
+	</script>
 		
-		 var yui_config = {
-		      // add MVP specific includes here, they will then be available to any
-		      // YUI instantiation like: YUI(yui_config)
-		      modules: {
-		         'a': {
-		            path: "./a.js"
-		         },
-		      },
-		      base: function() {
-		         var nodes = document.getElementsByTagName('script'), i;
-		         for (i=0; i<nodes.length; i=i+1) {
-		            var match = nodes[i].src.match(/^(.*)yui[\.-].*js(\?.*)?$/);
-		               base = match && match[1];
-		            if (base) {
-		               base = base.substring(0, base.length-4);
-		               break;
-		            }
-		         }
-		         return base;
-		      }(),
-	    };
-	   
-		
+	<script type="text/javascript">
+		// Third Block: combining YUI 3.x modules with a custom module defined inline
 		YUI_bootstrap({
-		    base:'../../yui3/build/',
-			seed: 'yui/yui-debug.js',
-			filter: 'debug',
 			modules: {
-				'foo': {
-					fullpath: './foo.js',
-					requires: ['node']
+				'bar': {
+					fullpath: './yui3-bar.js',
+					requires: ['object']
 				}
 			}
-		}).init();
-		
-		YUI_bootstrap().use('node', 'loader', function (Y) {
-			
-		    Y.get ('#demo .bd').set('innerHTML', 'everything is working properly...');
-			
-		});
-		
-		YUI_bootstrap().use('io', 'foo', function (Y) {
-			
-		    Y.get ('#demo .bd').set('innerHTML', 'everything is working properly and io, foo are ready..');
-			 
-		});
-		
+		}).use('animation', 'bar', function (Y) {
+		    alert ('Third Block: Ready...');
+		});		
 	</script>
 </body>
 </html>

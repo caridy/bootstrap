@@ -5,7 +5,7 @@
  */
 (function() {
 	
-	var _config = null,
+	var _config = {modules:{}},
 		_loaderQueue = [];
    	
 	/**
@@ -80,6 +80,14 @@
      *  <li>modules:
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
      * </ul>
+     * 
+     * Also, we can pass a custom argument thru "o" to customize
+     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
+     * define a custom COMBO url to load a default set of components including loader in a single entry.
+     * 
+     * @param boolean def if true, "o" will be used as the default configuration object for succesive 
+     * calls without the "o" argument.
+     *
      */
 	
 	/**
@@ -91,7 +99,7 @@
 	 */
 	function _loaderDispatch () {
 		var c;
-		if ((c = _loaderQueue.pop())) {
+		if ((c = _loaderQueue.shift())) {
 			c.call();
 		}
 	}
@@ -136,26 +144,26 @@
 	 * @return object computed configuration
 	 */
 	function _getConf(o) {
+		o = o||{};
 		var m = o.modules || {}, 
 			flag = true, i;
-		for (i in o) {
-		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
-		  		flag = false;
-		  	}
+		// using _config and injecting more modules
+		if (flag) {
+			for (i in m) {
+			  	if (m.hasOwnProperty(i)) {
+					_config.modules[i] = m[i];
+				}
+			}
+			o = _config;
 		}
-		return ((o && flag)?o:(_config||{}));
+		return o;
 	}
 	
-	YUI_bootstrap = function (o) {
-		console.log (o);
-		o = o||{};
-		// modules that should be added
-		var bk = o, 
-		    m = o.modules || {};
-		console.log (m);
+	YUI_bootstrap = function (o, def) {
 		// analyzing "o"
 		o = _getConf(o);
-		console.log (o, 'f');
+		// if def is true, o will be used as the default config from now on 
+		_config = (def?o:_config);
 		return {
 			/**
 		     * Load a set of modules and notify thru the callback method.
@@ -172,34 +180,14 @@
 				var a=Array.prototype.slice.call(arguments, 0);
 				_loaderQueue.push (function () {
 					var Y = YUI(o), i;
-					for (i in m) {
-						if (m.hasOwnProperty(i)) {
-							Y.Loader.addModule(m[i]);	
-						}
-					}
 					Y.use.apply (Y, a);
 					_loaderDispatch(); // dispatching the rest of the waiting jobs
 				});
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
-				((typeof YUI === 'undefined' || !YUI)?_includeLoader():_loaderDispatch());
-			},
-			/**
-		     * Setting the default configuration object. It will set the "o" as the default configuration 
-		     * object for succesive calls without the "o" argument. 
-		     * 
-		     * Also, we can pass a custom argument thru "o" to customize
-		     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-		     * define a custom COMBO url to load a default set of components including loader in a single entry.
-		     * 
-		     * YUI_bootstrap(o).init()
-		     *
-		     * @return void
-		     */
-			init: function () {
-				// verifying if the loader is ready in the page, if not, it will be 
-				// included automatically and then the process will continue.
-				_config = (_config?_config:(bk||{modules:o}));
+				if (_loaderQueue.length===1) {
+					((typeof YUI === 'undefined' || !YUI)?_includeLoader():_loaderDispatch());				
+				}
 			}
 		};
 	};
@@ -207,8 +195,6 @@
 })();
 /** 
  * Provides Bootstrap definition based on YUI 2.x.
- *
- * ---
  *
  * @module bootstrap
  */
@@ -291,20 +277,12 @@
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
      * </ul>
      * 
-     * Final Note: 
-     * The first time this function get invoked, it will set the "o" as the default configuration 
-     * object for succesive calls without the "o" argument. 
-     * 
      * Also, we can pass a custom argument thru "o" to customize
      * the file that should be injected to define the YUI Loader Utility. This feature allow us to
      * define a custom COMBO url to load a default set of components including loader in a single entry.
+     * 
      * @param boolean def if true, "o" will be used as the default configuration object for succesive 
      * calls without the "o" argument.
-     * 
-     * Also, we can pass a custom argument thru "o" to customize
-     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-     * define a custom COMBO url to load a default set of components including loader in a single entry.
-     * 
      * 
 	 */
 	
@@ -435,7 +413,6 @@
 		o = _getConf(o);
 		// if def is true, o will be used as the default config from now on 
 		_config = (def?o:_config);
-		//console.log (o, _config, 'f');
 		return {
 			/**
 		     * Load a set of modules and notify thru the callback method.
@@ -474,7 +451,7 @@
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
 				if (_loaderQueue.length===1) {
-					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch(true));				
+					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch());				
 				}
 			}
 		};
