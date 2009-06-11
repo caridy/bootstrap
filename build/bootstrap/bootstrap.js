@@ -147,6 +147,11 @@
 		o = o||{};
 		var m = o.modules || {}, 
 			flag = true, i;
+		for (i in o) {
+		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
+		  		flag = false;
+		  	}
+		}
 		// using _config and injecting more modules
 		if (flag) {
 			for (i in m) {
@@ -179,7 +184,15 @@
 			use: function () {
 				var a=Array.prototype.slice.call(arguments, 0);
 				_loaderQueue.push (function () {
-					var Y = YUI(o), i;
+					/* hack: cloning configuration */
+					var j, c = {};
+					for (j in o) {
+					  	if (o.hasOwnProperty(j)) {
+							c[j] = o[j];
+						}
+					}
+					/* end hack */
+					var Y = YUI(c), i;
 					Y.use.apply (Y, a);
 					_loaderDispatch(); // dispatching the rest of the waiting jobs
 				});
@@ -336,7 +349,16 @@
 		}();
 	}
 	
+	/**
+	 * Add a set of modules to _loaderObj, it also normalize the module information before include it
+	 * @method _addMods
+	 * @private
+	 * @static
+	 * @param {object} m collection of modules
+	 * @return void
+	 */
 	function _addMods (m) {
+		var i;
 		// adding modules to the loader 
 		if (m && (typeof m === 'object')) {
 			for (i in m) {

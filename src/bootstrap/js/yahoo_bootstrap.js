@@ -141,7 +141,16 @@
 		}();
 	}
 	
+	/**
+	 * Add a set of modules to _loaderObj, it also normalize the module information before include it
+	 * @method _addMods
+	 * @private
+	 * @static
+	 * @param {object} m collection of modules
+	 * @return void
+	 */
 	function _addMods (m) {
+		var i;
 		// adding modules to the loader 
 		if (m && (typeof m === 'object')) {
 			for (i in m) {

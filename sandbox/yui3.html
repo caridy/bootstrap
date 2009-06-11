@@ -37,7 +37,7 @@
 
 	<script type="text/javascript">
 		// First Block: using YUI 3.x modules
-		YUI_bootstrap().use('event', 'node', 'array', function (Y) {
+		YUI_bootstrap().use('event', 'node', function (Y) {
 		    alert ('First Block: Ready...');
 		});
 	</script>
@@ -55,10 +55,10 @@
 			modules: {
 				'bar': {
 					fullpath: './yui3-bar.js',
-					requires: ['object']
+					requires: ['event']
 				}
 			}
-		}).use('animation', 'bar', function (Y) {
+		}).use('io', 'bar', function (Y) {
 		    alert ('Third Block: Ready...');
 		});		
 	</script>
