@@ -136,22 +136,22 @@
 	 * @return object computed configuration
 	 */
 	function _getConf(o) {
-		var m = (o||{}).modules || {}, 
+		var m = o.modules || {}, 
 			flag = true, i;
-		if (m) {
-		  for (i in m) {
-		  	if (m.hasOwnProperty(i) && (i != 'modules')) {
+		for (i in o) {
+		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
 		  		flag = false;
 		  	}
-		  }
 		}
 		return ((o && flag)?o:(_config||{}));
 	}
 	
 	YUI_bootstrap = function (o) {
 		console.log (o);
+		o = o||{};
 		// modules that should be added
-		var m = (o||{}).modules || {};
+		var bk = o, 
+		    m = o.modules || {};
 		console.log (m);
 		// analyzing "o"
 		o = _getConf(o);
@@ -199,7 +199,7 @@
 			init: function () {
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
-				_config = (_config?_config:(o||{}));
+				_config = (_config?_config:(bk||{modules:o}));
 			}
 		};
 	};

@@ -7,7 +7,7 @@
  */
 (function() {
 	
-	var _config = null,
+	var _config = {modules:{}},
 		_loaderObj = null,
 		_loaderQueue = [];
 		
@@ -91,7 +91,15 @@
      * Also, we can pass a custom argument thru "o" to customize
      * the file that should be injected to define the YUI Loader Utility. This feature allow us to
      * define a custom COMBO url to load a default set of components including loader in a single entry.
-     */
+     * @param boolean def if true, "o" will be used as the default configuration object for succesive 
+     * calls without the "o" argument.
+     * 
+     * Also, we can pass a custom argument thru "o" to customize
+     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
+     * define a custom COMBO url to load a default set of components including loader in a single entry.
+     * 
+     * 
+	 */
 	
 	/**
 	 * Dispatch the first element from the job queue 
@@ -102,7 +110,7 @@
 	 */
 	function _loaderDispatch () {
 		var c;
-		if ((c = _loaderQueue.pop())) {
+		if ((c = _loaderQueue.shift())) {
 			c.call();
 		}
 	}
@@ -116,7 +124,10 @@
 	 * @return void
 	 */
 	function _includeLoader () {
-		var seed = _config.seed || 'http://yui.yahooapis.com/2.7.0/build/yuiloader/yuiloader-min.js';
+		var base = _config.base || 'http://yui.yahooapis.com/2.7.0/build/',
+			seed = _config.seed || 'yuiloader/yuiloader-min.js';
+		// analyzing the seed
+		seed = (seed.indexOf('http')===0?seed:base+seed);
 		/**
 		 * Encapsulation Pattern: Conjuring YUI from thin air (by Chris Heilmann)
 		 * http://www.wait-till-i.com/2008/08/02/conjuring-yui-from-thin-air/
@@ -139,6 +150,20 @@
 		    };
 		}();
 	}
+	
+	function _addMods (m) {
+		// adding modules to the loader 
+		if (m && (typeof m === 'object')) {
+			for (i in m) {
+				if (m.hasOwnProperty(i)) {
+					m[i].name = m[i].name || i;
+					m[i].type = m[i].type || ((m[i].fullpath||m[i].path).indexOf('.css')>=0?'css':'js');
+					//console.log ('Adding a default module: ', m[i].name, m[i]);
+					_loaderObj.addModule (m[i]);
+				}
+			}
+		}
+	} 
 
 	/**
 	 * Initialization process for the YUI Loader obj. In YUI 2.x we should
@@ -160,19 +185,9 @@
 			// more config here ...
 		
 			_loaderObj = new YAHOO.util.YUILoader(l);			
+			_addMods(l.modules);
 		}
 		// probably more configurations here
-		
-		m = l.modules || {};
-		// adding modules to the loader 
-		if (m && (typeof m === 'object')) {
-			for (i in m) {
-				if (m.hasOwnProperty(i)) {
-					m[i].name = i;
-					_loaderObj.addModule (m[i]);
-				}
-			}
-		}
 	}
 	
 	/**
@@ -185,26 +200,35 @@
 	 * @return object computed configuration
 	 */
 	function _getConf(o) {
-		var m = (o||{}).modules || {}, 
+		o = o||{};
+		var m = o.modules || {}, 
 			flag = true, i;
-		if (m) {
-		  for (i in m) {
-		  	if (m.hasOwnProperty(i) && (i != 'modules')) {
+		for (i in o) {
+		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
 		  		flag = false;
 		  	}
-		  }
 		}
-		return ((o && flag)?o:(_config||{}));
+		// using _config and injecting more modules
+		if (flag) {
+			for (i in m) {
+			  	if (m.hasOwnProperty(i)) {
+					_config.modules[i] = m[i];
+				}
+			}
+			if (_loaderObj) {
+				_addMods(m);
+			}
+			o = _config;
+		}
+		return o;
 	}
 	
-	YAHOO_bootstrap = function (o) {
-		console.log (o);
-		// modules that should be added
-		var m = (o||{}).modules || {};
-		console.log (m);
+	YAHOO_bootstrap = function (o, def) {
 		// analyzing "o"
 		o = _getConf(o);
-		console.log (o, 'f');
+		// if def is true, o will be used as the default config from now on 
+		_config = (def?o:_config);
+		//console.log (o, _config, 'f');
 		return {
 			/**
 		     * Load a set of modules and notify thru the callback method.
@@ -223,11 +247,6 @@
 				_loaderQueue.push (function () {
 					var i;
 					_initLoader(o);
-					for (i in m) {
-						if (m.hasOwnProperty(i)) {
-							_loaderObj.addModule(m[i]);
-						}
-					}
 					_loaderObj.require(a);
 					_loaderObj.insert({
 						onSuccess: function () {
@@ -247,24 +266,9 @@
 				});
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
-				((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch());
-			},
-			/**
-		     * Setting the default configuration object. It will set the "o" as the default configuration 
-		     * object for succesive calls without the "o" argument. 
-		     * 
-		     * Also, we can pass a custom argument thru "o" to customize
-		     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-		     * define a custom COMBO url to load a default set of components including loader in a single entry.
-		     * 
-		     * YUI_bootstrap(o).init()
-		     *
-		     * @return void
-		     */
-			init: function () {
-				// verifying if the loader is ready in the page, if not, it will be 
-				// included automatically and then the process will continue.
-				_config = (_config?_config:(o||{}));
+				if (_loaderQueue.length===1) {
+					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch(true));				
+				}
 			}
 		};
 	};
