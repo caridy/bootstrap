@@ -1,0 +1,299 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: bootstrap  YAHOO_bootstrap   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>bootstrap&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_bootstrap.html" title="bootstrap">bootstrap</a>
+                 &gt; YAHOO_bootstrap 
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <h2>
+                        
+
+                        
+                        
+                            Class <b property="yui:name">YAHOO_bootstrap</b>
+                        <span class="extends">
+                        </span>
+
+                    </h2>
+                    <!-- class tree goes here -->
+                    
+                
+  
+
+                    <div class="summary description" property="yui:description">
+                        YAHOO_bootstrap function.  If YAHOO_bootstrap is already defined, the
+existing YAHOO_bootstrap function will not be overwritten to preserve
+the state of the bootstrap.
+                    </div>
+
+                        <div class="section constructor details" rel="yui:constructor" resource="#constructor">
+                        <h3 id="constructor">Constructor</h3>
+                        <div class="content">
+                            <div class="detail">
+                                <strong property="yui:name">YAHOO_bootstrap</strong>
+                                <code>
+                                    (
+  
+                                        
+                                                
+                                                o
+
+                                                , 
+                                                def
+                                    )
+                                </code>
+                                <div class="description">
+                                        <dl rel="yui:parameters">
+                                            <dt>Parameters:</dt>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">o</span>
+                                                    &lt;<span property="yui:type">object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description"> Optional configuration object.  Options:
+<ul>
+<li>------------------------------------------------------------------------</li>
+<li>Global:</li>
+<li>------------------------------------------------------------------------</li>
+<li>debug: Turn debug statements on or off</li>
+<li>injected: set to true if the yui seed file was dynamically loaded in
+order to bootstrap components relying on the window load event and onDOMReady
+(former injecting on YAHOO_config).</li>
+<li>locale: default locale</li>
+<li>-------------------------------------------------------------------------</li>
+<li>For loader:</li>
+<li>-------------------------------------------------------------------------</li>
+<li>base: The base dir</li>
+<li>comboBase: The YUI combo service base dir. Ex: http://yui.yahooapis.com/combo?</li>
+<li>root: The root path to prepend to module names for the combo service. Ex\\: 2\\.5\\.2\\/build\\/</li>
+<li>filter:
+A filter to apply to result urls.  This filter will modify the default
+path for all modules.  The default path for the YUI library is the
+minified version of the files (e.g., event-min.js).  The filter property
+can be a predefined filter or a custom filter.  The valid predefined 
+filters are:
+<dl>
+<dt>DEBUG</dt>
+<dd>Selects the debug versions of the library (e.g., event-debug.js).
+This option will automatically include the Logger widget</dd>
+<dt>RAW</dt>
+<dd>Selects the non-minified version of the library (e.g., event.js).</dd>
+</dl>
+You can also define a custom filter, which must be an object literal 
+containing a search expression and a replace string:
+<pre>
+myFilter: &#123; 
+'searchExp': "-min\\.js", 
+'replaceStr': "-debug.js"
+&#125;
+</pre>
+</li>
+<li>filters: per-component filter specification.  If specified for a given component, this overrides the filter config</li>
+<li>combine:
+Use the YUI combo service to reduce the number of http connections required to load your dependencies</li>
+<li>ignore:
+A list of modules that should never be dynamically loaded</li>
+<li>force:
+A list of modules that should always be loaded when required, even if already present on the page</li>
+<li>insertBefore:
+Node or id for a node that should be used as the insertion point for new nodes</li>
+<li>charset:
+charset for dynamic nodes</li>
+<li>timeout:
+number of milliseconds before a timeout occurs when dynamically loading nodes.  in not set, there is no timeout</li>
+<li>onSuccess:
+callback for the 'success' event</li>
+<li>onFailure:
+callback for the 'failure' event</li>
+<li>onTimeout:
+callback for the 'timeout' event</li>
+<li>onProgress:
+callback executed each time a script or css file is loaded</li>
+<li>modules:
+A list of module definitions.  See Loader.addModule for the supported module metadata</li>
+<li>seed:
+custom COMBO url to load a default set of components including loader in a single entry.</li>
+</ul></span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">def</span>
+                                                    &lt;<span property="yui:type">boolean</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description">  if true, "o" will be used as the default configuration object for succesive 
+calls without the "o" argument.</span>
+                                                </dd>
+                                        </dl>
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div rel="yui:properties" resource="#properties">
+
+                    </div>
+
+                    <div rel="yui:methods" resource="#methods">
+                        <div class="section method details">
+                            <h3 id="methods">Methods</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:method" resource="#method_use">
+                                    <h4>
+                                        <a name="method_use">use</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        
+                                            <strong property="yui:name">use</strong>
+                                           (
+                                                
+                                                        
+                                                         modules*
+                                                    
+                                                
+                                                        , 
+                                                         *callback
+                                                    
+                                                
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Load a set of modules and notify thru the callback method.
+                                        </div>
+
+                                        <div class="description">
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">modules*</span>
+                                                        &lt;<span property="yui:type">string</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  1-n modules to bind (uses arguments array)</span>
+                                                        </dd>
+                                                        <dd rel="yui:parameter">
+                                                        <code><span property="yui:name">*callback</span>
+                                                        &lt;<span property="yui:type">function</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">  callback function executed when 
+the instance has the required functionality.  If included, it
+must be the last parameter.
+YAHOO_bootstrap().use('tabview', callback)</span>
+                                                        </dd>
+                                                </dl>
+
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div rel="yui:events" resource="#events">
+
+
+                    </div>
+
+                    <div rel="yui:attributes" resource="#configattributes">
+
+                    </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_bootstrap.html" title="bootstrap">bootstrap</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="YAHOO_bootstrap.html" title="YAHOO_bootstrap">YAHOO_bootstrap</a></li>
+                                <li class=""><a href="YUI_bootstrap.html" title="YUI_bootstrap">YUI_bootstrap</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="yahoo_bootstrap.js.html" title="yahoo_bootstrap.js">yahoo_bootstrap.js</a></li>
+                                <li class=""><a href="yui_bootstrap.js.html" title="yui_bootstrap.js">yui_bootstrap.js</a></li>
+                        </ul>
+                    </div>
+
+
+                    <div id="methodsList" class="module">
+                        <h4>Methods</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#method_use" title="use">use</a></li>
+                        </ul>
+                    </div>
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2009 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+    ALL_YUI_PROPS = [{"url": "YAHOO_bootstrap.html#method_use", "access": "", "host": "YAHOO_bootstrap", "type": "method", "name": "use"}];
+</script>
+</body>
+</html>

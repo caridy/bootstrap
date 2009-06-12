@@ -4,7 +4,11 @@
  * @module bootstrap
  */
 (function() {
-	
+
+	if ((typeof YAHOO_bootstrap != "undefined") && YAHOO_bootstrap) {
+		return;
+	}
+		
 	var _config = {modules:{}},
 		_loaderObj = null,
 		_loaderQueue = [];
@@ -15,7 +19,7 @@
      * the state of the bootstrap.
      *
      * @class YAHOO_bootstrap
-     * @static
+     * @constructor
      * @global
      * @param o Optional configuration object.  Options:
      * <ul>
@@ -80,148 +84,143 @@
      *  callback executed each time a script or css file is loaded</li>
      *  <li>modules:
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
+     *  <li>seed:
+     *  custom COMBO url to load a default set of components including loader in a single entry.</li>
      * </ul>
      * 
-     * Also, we can pass a custom argument thru "o" to customize
-     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-     * define a custom COMBO url to load a default set of components including loader in a single entry.
-     * 
-     * @param boolean def if true, "o" will be used as the default configuration object for succesive 
+     * @param def {boolean} if true, "o" will be used as the default configuration object for succesive 
      * calls without the "o" argument.
-     * 
 	 */
 	
-	/**
-	 * Dispatch the first element from the job queue 
-	 * @method _loaderDispatch
-	 * @private
-	 * @static
-	 * @return void
-	 */
-	function _loaderDispatch () {
-		var c;
-		if ((c = _loaderQueue.shift())) {
-			c.call();
-		}
-	}
-	
-	/**
-	 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
-	 * from the queue
-	 * @method _includeLoader
-	 * @private
-	 * @static
-	 * @return void
-	 */
-	function _includeLoader () {
-		var base = _config.base || 'http://yui.yahooapis.com/2.7.0/build/',
-			seed = _config.seed || 'yuiloader/yuiloader-min.js';
-		// analyzing the seed
-		seed = (seed.indexOf('http')===0?seed:base+seed);
 		/**
-		 * Encapsulation Pattern: Conjuring YUI from thin air (by Chris Heilmann)
-		 * http://www.wait-till-i.com/2008/08/02/conjuring-yui-from-thin-air/
+		 * Dispatch the first element from the job queue 
+		 * @method _loaderDispatch
+		 * @private
+		 * @static
+		 * @return void
 		 */
-		YAHOO_config = function() {
-		    /* injecting the YUI Loader in the current page */
-		    var s = document.createElement('script');
-		    s.setAttribute('type', 'text/javascript');
-		    s.setAttribute('src', seed);
-		    document.getElementsByTagName('head')[0].appendChild(s);
-		    return {
-		        // true if the library should be dynamically loaded after window.onload.
-		        injecting: !!_config.injected,
-		        listener: function(o) {
-		            // waiting for the loader component
-		            if (o.name === 'get') {
-		                window.setTimeout(_loaderDispatch, 1);
-		            }
-		        }
-		    };
-		}();
-	}
-	
-	/**
-	 * Add a set of modules to _loaderObj, it also normalize the module information before include it
-	 * @method _addMods
-	 * @private
-	 * @static
-	 * @param {object} m collection of modules
-	 * @return void
-	 */
-	function _addMods (m) {
-		var i;
-		// adding modules to the loader 
-		if (m && (typeof m === 'object')) {
-			for (i in m) {
-				if (m.hasOwnProperty(i)) {
-					m[i].name = m[i].name || i;
-					m[i].type = m[i].type || ((m[i].fullpath||m[i].path).indexOf('.css')>=0?'css':'js');
-					//console.log ('Adding a default module: ', m[i].name, m[i]);
-					_loaderObj.addModule (m[i]);
-				}
+		function _loaderDispatch () {
+			var c;
+			if ((c = _loaderQueue.shift())) {
+				c.call();
 			}
 		}
-	} 
-
-	/**
-	 * Initialization process for the YUI Loader obj. In YUI 2.x we should
-	 * have a single instance to control everything.
-	 * @method _initLoader
-	 * @private
-	 * @static
-	 * @return void
-	 */
-	function _initLoader (l) {
-	    var i, m;
 		
-		if (!_loaderObj) {
-			/* creating the loader object for this region */
-			l = l || {};
-			l.combine = (l.hasOwnProperty('combine')?l.combine:true); /* using the Combo Handle */
-		    l.filter = l.filter || 'min';  /* you can switch between YUI branch */
+		/**
+		 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
+		 * from the queue
+		 * @method _includeLoader
+		 * @private
+		 * @static
+		 * @return void
+		 */
+		function _includeLoader () {
+			var base = _config.base || 'http://yui.yahooapis.com/2.7.0/build/',
+				seed = _config.seed || 'yuiloader/yuiloader-min.js';
+			// analyzing the seed
+			seed = (seed.indexOf('http')===0?seed:base+seed);
+			// Encapsulation Pattern: Conjuring YUI from thin air (by Chris Heilmann)
+			// more info: http://www.wait-till-i.com/2008/08/02/conjuring-yui-from-thin-air/
+			YAHOO_config = function() {
+			    /* injecting the YUI Loader in the current page */
+			    var s = document.createElement('script');
+			    s.setAttribute('type', 'text/javascript');
+			    s.setAttribute('src', seed);
+			    document.getElementsByTagName('head')[0].appendChild(s);
+			    return {
+			        // true if the library should be dynamically loaded after window.onload.
+			        injecting: !!_config.injected,
+			        listener: function(o) {
+			            // waiting for the loader component
+			            if (o.name === 'get') {
+			                window.setTimeout(_loaderDispatch, 1);
+			            }
+			        }
+			    };
+			}();
+		}
+		
+		/**
+		 * Add a set of modules to _loaderObj, it also normalize the module information before include it
+		 * @method _addMods
+		 * @private
+		 * @static
+		 * @param m {object} collection of modules
+		 * @return void
+		 */
+		function _addMods (m) {
+			var i;
+			// adding modules to the loader 
+			if (m && (typeof m === 'object')) {
+				for (i in m) {
+					if (m.hasOwnProperty(i)) {
+						m[i].name = m[i].name || i;
+						m[i].type = m[i].type || ((m[i].fullpath||m[i].path).indexOf('.css')>=0?'css':'js');
+						//console.log ('Adding a default module: ', m[i].name, m[i]);
+						_loaderObj.addModule (m[i]);
+					}
+				}
+			}
+		} 
+	
+		/**
+		 * Initialization process for the YUI Loader obj. In YUI 2.x we should
+		 * have a single instance to control everything.
+		 * @method _initLoader
+		 * @private
+		 * @static
+		 * @return void
+		 */
+		function _initLoader (l) {
+		    var i, m;
 			
-			// more config here ...
+			if (!_loaderObj) {
+				/* creating the loader object for this region */
+				l = l || {};
+				l.combine = (l.hasOwnProperty('combine')?l.combine:true); /* using the Combo Handle */
+			    l.filter = l.filter || 'min';  /* you can switch between YUI branch */
+				
+				// more config here ...
+			
+				_loaderObj = new YAHOO.util.YUILoader(l);			
+				_addMods(l.modules);
+			}
+			// probably more configurations here
+		}
 		
-			_loaderObj = new YAHOO.util.YUILoader(l);			
-			_addMods(l.modules);
-		}
-		// probably more configurations here
-	}
-	
-	/**
-	 * Verify if the current configuration object just defines new modules. If that's the case, 
-	 * we will use "_config" as the computed configuration, and "o" as the list of modules to add.
-	 * @method _getConf
-	 * @param o currrent configuration object
-	 * @private
-	 * @static
-	 * @return object computed configuration
-	 */
-	function _getConf(o) {
-		o = o||{};
-		var m = o.modules || {}, 
-			flag = true, i;
-		for (i in o) {
-		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
-		  		flag = false;
-		  	}
-		}
-		// using _config and injecting more modules
-		if (flag) {
-			for (i in m) {
-			  	if (m.hasOwnProperty(i)) {
-					_config.modules[i] = m[i];
+		/**
+		 * Verify if the current configuration object just defines new modules. If that's the case, 
+		 * we will use "_config" as the computed configuration, and "o" as the list of modules to add.
+		 * @method _getConf
+		 * @param o {object} currrent configuration object
+		 * @private
+		 * @static
+		 * @return object computed configuration
+		 */
+		function _getConf(o) {
+			o = o||{};
+			var m = o.modules || {}, 
+				flag = true, i;
+			for (i in o) {
+			  	if (o.hasOwnProperty(i) && (i != 'modules')) {
+			  		flag = false;
+			  	}
+			}
+			// using _config and injecting more modules
+			if (flag) {
+				for (i in m) {
+				  	if (m.hasOwnProperty(i)) {
+						_config.modules[i] = m[i];
+					}
 				}
+				if (_loaderObj) {
+					_addMods(m);
+				}
+				o = _config;
 			}
-			if (_loaderObj) {
-				_addMods(m);
-			}
-			o = _config;
+			return o;
 		}
-		return o;
-	}
-	
+
 	YAHOO_bootstrap = function (o, def) {
 		// analyzing "o"
 		o = _getConf(o);

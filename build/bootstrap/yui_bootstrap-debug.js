@@ -5,16 +5,20 @@
  */
 (function() {
 	
+	if ((typeof YUI_bootstrap != "undefined") && YUI_bootstrap) {
+		return;
+	}
+	
 	var _config = {modules:{}},
 		_loaderQueue = [];
-   	
+	
 	/**
      * YUI_bootstrap function.  If YUI_bootstrap is already defined, the
      * existing YUI_bootstrap function will not be overwritten to preserve
      * the state of the bootstrap.
      *
      * @class YUI_bootstrap
-     * @static
+     * @constructor
      * @global
      * @param o Optional configuration object.  Options:
      * <ul>
@@ -79,91 +83,88 @@
      *  callback executed each time a script or css file is loaded</li>
      *  <li>modules:
      *  A list of module definitions.  See Loader.addModule for the supported module metadata</li>
+     *  <li>seed:
+     *  custom COMBO url to load a default set of components including loader in a single entry.</li>
      * </ul>
      * 
-     * Also, we can pass a custom argument thru "o" to customize
-     * the file that should be injected to define the YUI Loader Utility. This feature allow us to
-     * define a custom COMBO url to load a default set of components including loader in a single entry.
-     * 
-     * @param boolean def if true, "o" will be used as the default configuration object for succesive 
+     * @param def {boolean} if true, "o" will be used as the default configuration object for succesive 
      * calls without the "o" argument.
-     *
      */
 	
-	/**
-	 * Dispatch the first element from the job queue 
-	 * @method _loaderDispatch
-	 * @private
-	 * @static
-	 * @return void
-	 */
-	function _loaderDispatch () {
-		var c;
-		if ((c = _loaderQueue.shift())) {
-			c.call();
-		}
-	}
-	
-	/**
-	 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
-	 * from the queue
-	 * @method _includeLoader
-	 * @private
-	 * @static
-	 * @return void
-	 */
-	function _includeLoader () {
-		/* injecting the YUI Loader in the current page */
-		var base = _config.base || 'http://yui.yahooapis.com/3.0.0pr2/build/',
-			seed = _config.seed || 'yui/yui-min.js',
-			s = document.createElement('script'),
-			fn = function(){
-				if ((typeof YUI === 'undefined') || !YUI || YUI.Loader) {
-					// keep waiting...
-					window.setTimeout(fn, 50);
-				} else {	  
-					// YUI is ready...
-					window.setTimeout(_loaderDispatch, 1);
-				}
-		    };
-	    s.setAttribute('type', 'text/javascript');
-		// analyzing the seed
-		seed = (seed.indexOf('http')===0?seed:base+seed);
-	    s.setAttribute('src', seed);
-	    document.getElementsByTagName('head')[0].appendChild(s);
-		fn();
-	}
-	
-	/**
-	 * Verify if the current configuration object just defines new modules. If that's the case, 
-	 * we will use "_config" as the computed configuration, and "o" as the list of modules to add.
-	 * @method _getConf
-	 * @param o currrent configuration object
-	 * @private
-	 * @static
-	 * @return object computed configuration
-	 */
-	function _getConf(o) {
-		o = o||{};
-		var m = o.modules || {}, 
-			flag = true, i;
-		for (i in o) {
-		  	if (o.hasOwnProperty(i) && (i != 'modules')) {
-		  		flag = false;
-		  	}
-		}
-		// using _config and injecting more modules
-		if (flag) {
-			for (i in m) {
-			  	if (m.hasOwnProperty(i)) {
-					_config.modules[i] = m[i];
-				}
+		/**
+		 * Dispatch the first element from the job queue 
+		 * @method _loaderDispatch
+		 * @private
+		 * @static
+		 * @return void
+		 */
+		function _loaderDispatch () {
+			var c;
+			if ((c = _loaderQueue.shift())) {
+				c.call();
 			}
-			o = _config;
 		}
-		return o;
-	}
-	
+		
+		/**
+		 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
+		 * from the queue
+		 * @method _includeLoader
+		 * @private
+		 * @static
+		 * @return void
+		 */
+		function _includeLoader () {
+			/* injecting the YUI Loader in the current page */
+			var base = _config.base || 'http://yui.yahooapis.com/3.0.0pr2/build/',
+				seed = _config.seed || 'yui/yui-min.js',
+				s = document.createElement('script'),
+				fn = function(){
+					if ((typeof YUI === 'undefined') || !YUI || YUI.Loader) {
+						// keep waiting...
+						window.setTimeout(fn, 50);
+					} else {	  
+						// YUI is ready...
+						window.setTimeout(_loaderDispatch, 1);
+					}
+			    };
+		    s.setAttribute('type', 'text/javascript');
+			// analyzing the seed
+			seed = (seed.indexOf('http')===0?seed:base+seed);
+		    s.setAttribute('src', seed);
+		    document.getElementsByTagName('head')[0].appendChild(s);
+			fn();
+		}
+		
+		/**
+		 * Verify if the current configuration object just defines new modules. If that's the case, 
+		 * we will use "_config" as the computed configuration, and "o" as the list of modules to add.
+		 * @method _getConf
+		 * @param o {object} currrent configuration object
+		 * @private
+		 * @static
+		 * @return {object} computed configuration
+		 */
+		function _getConf(o) {
+			o = o||{};
+			var m = o.modules || {}, 
+				flag = true, i;
+			for (i in o) {
+			  	if (o.hasOwnProperty(i) && (i != 'modules')) {
+			  		flag = false;
+			  	}
+			}
+			// using _config and injecting more modules
+			if (flag) {
+				for (i in m) {
+				  	if (m.hasOwnProperty(i)) {
+						_config.modules[i] = m[i];
+					}
+				}
+				o = _config;
+			}
+			return o;
+		}
+		
 	YUI_bootstrap = function (o, def) {
 		// analyzing "o"
 		o = _getConf(o);
