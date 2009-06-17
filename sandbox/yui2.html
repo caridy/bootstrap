@@ -27,10 +27,7 @@
     <div id="doc">
 
 		<div id="demo">
-			<div class="hd"><h3 class="title">H3 - Title</h3></div>
-			<div class="bd">
-				<p>&nbsp;</p>
-			</div>
+			<h3 class="title">Result:</h3>
 		</div>
 
     </div>
@@ -38,14 +35,14 @@
 	<script type="text/javascript">
 		// First Block: using YUI 2.x modules
 		YAHOO_bootstrap().use('event', 'dom', 'connection', function (Y) {
-		    alert ('First Block: Ready...');
+		    YAHOO.util.Dom.get('demo').innerHTML += '<p>YUI2: First Block: Ready...</p>';
 		});
 	</script>
 
 	<script type="text/javascript">
 		// Second Block: combining YUI 2.x modules with a custom module defined in the initialization
 		YAHOO_bootstrap().use('event', 'dom', 'json', 'foo', function (Y) {
-		    alert ('Second Block: Ready...');
+		    YAHOO.util.Dom.get('demo').innerHTML += '<p>YUI2: Second Block: Ready...</p>';
 		});		
 	</script>
 		
@@ -59,7 +56,7 @@
 				}
 			}
 		}).use('animation', 'bar', function (Y) {
-		    alert ('Third Block: Ready...');
+		    YAHOO.util.Dom.get('demo').innerHTML += '<p>YUI2: Third Block: Ready...</p>';
 		});		
 	</script>
 </body>

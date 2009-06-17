@@ -92,7 +92,7 @@
      */
 	
 		/**
-		 * Dispatch the first element from the job queue 
+		 * Dispatch all the pending jobs, yui 3.x will handle the queue 
 		 * @method _loaderDispatch
 		 * @private
 		 * @static
@@ -100,14 +100,13 @@
 		 */
 		function _loaderDispatch () {
 			var c;
-			if ((c = _loaderQueue.shift())) {
+			while ((c = _loaderQueue.shift())) {
 				c.call();
 			}
 		}
 		
 		/**
 		 * Include YUI Loader in the the page, and wait until it get available to start dispatching jobs
-		 * from the queue
 		 * @method _includeLoader
 		 * @private
 		 * @static
@@ -119,7 +118,7 @@
 				seed = _config.seed || 'yui/yui-min.js',
 				s = document.createElement('script'),
 				fn = function(){
-					if ((typeof YUI === 'undefined') || !YUI || YUI.Loader) {
+					if ((typeof YUI === 'undefined') || !YUI) {
 						// keep waiting...
 						window.setTimeout(fn, 50);
 					} else {	  
@@ -185,15 +184,7 @@
 			use: function () {
 				var a=Array.prototype.slice.call(arguments, 0);
 				_loaderQueue.push (function () {
-					/* hack: cloning configuration */
-					var j, c = {};
-					for (j in o) {
-					  	if (o.hasOwnProperty(j)) {
-							c[j] = o[j];
-						}
-					}
-					/* end hack */
-					var Y = YUI(c), i;
+					var Y = YUI(o);
 					Y.use.apply (Y, a);
 					_loaderDispatch(); // dispatching the rest of the waiting jobs
 				});

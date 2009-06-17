@@ -9,29 +9,11 @@
 		// initialization (optional)
 		YUI_bootstrap({
 		    base:'../../yui3/build/',
-			seed: 'yui/yui-debug.js',
-			filter: 'debug',
-			loadOptional: true, 
 			combine: false,
 			modules: {
 				'foo': {
 					fullpath: './yui3-foo.js',
 					requires: ['node']
-				}
-			}
-		}, true);
-		
-		// initialization (optional)
-		YAHOO_bootstrap({
-		    base:'../../yui2/build/',
-			seed: 'yuiloader/yuiloader-debug.js',
-			filter: 'debug',
-			loadOptional: true, 
-			combine: false,
-			modules: {
-				'foo': {
-					fullpath: './yui2-foo.js',
-					requires: ['event']
 				}
 			}
 		}, true);
@@ -42,10 +24,7 @@
     <div id="doc">
 
 		<div id="demo">
-			<div class="hd"><h3 class="title">H3 - Title</h3></div>
-			<div class="bd">
-				<p>&nbsp;</p>
-			</div>
+			<h3 class="title">Result: </h3>
 		</div>
 
     </div>
@@ -53,7 +32,7 @@
 	<script type="text/javascript">
 		// First Block: using YUI 3.x modules
 		YUI_bootstrap().use('event', 'node', function (Y) {
-		    alert ('First Block: Ready...');
+			Y.get('#demo').append('<p>YUI3: First Block: Ready...</p>');
 		});
 	</script>
 
@@ -61,14 +40,14 @@
 		// Second Block: using YUI 2.x modules
 		// in this case we want to use YUI hosted solution directly, without previous initialization
 		YAHOO_bootstrap().use('event', 'dom', 'connection', function (Y) {
-		    alert ('Second Block: Ready...');
+		    YAHOO.util.Dom.get('demo').innerHTML += '<p>YUI2: Second Block: Ready...</p>';
 		});
 	</script>
 	
 	<script type="text/javascript">
 		// Third Block: combining YUI 3.x modules with a custom module defined in the initialization
 		YUI_bootstrap().use('node', 'dd', 'foo', function (Y) {
-		    alert ('Third Block: Ready...');
+			Y.get('#demo').append('<p>YUI3: Third Block: Ready...</p>');
 		});		
 	</script>
 	
@@ -82,7 +61,7 @@
 				}
 			}
 		}).use('animation', 'bar', function (Y) {
-		    alert ('Fourth Block: Ready...');
+		    YAHOO.util.Dom.get('demo').innerHTML += '<p>YUI2: Fourth Block: Ready...</p>';
 		});		
 	</script>
 		
@@ -96,15 +75,15 @@
 				}
 			}
 		}).use('io', 'bar', function (Y) {
-		    alert ('Fifth Block: Ready...');
+		    Y.get('#demo').append('<p>YUI3: Fifth Block: Ready...</p>');
 		});		
 	</script>
 	
 	<script type="text/javascript">
 		// Sixth Block: using YUI 2.x + YUI 3.x modules
-		YAHOO_bootstrap().use('event', 'dom', function (Y) {
-		    YUI_bootstrap().use('container', function (Y) {
-			    alert ('Sixth Block: Ready...');
+		YAHOO_bootstrap().use('event', 'dom', function (Y2) {
+		    YUI_bootstrap().use('node', function (Y3) {
+			    Y3.get('#demo').append('<p>YUI2+YUI3: Sixth Block: Ready...</p>');
 			});
 		});
 	</script>

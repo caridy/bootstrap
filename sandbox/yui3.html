@@ -9,7 +9,6 @@
 		// initialization (optional)
 		YUI_bootstrap({
 		    base:'../../yui3/build/',
-			seed: 'yui/yui-debug.js',
 			filter: 'debug',
 			loadOptional: true, 
 			combine: false,
@@ -27,10 +26,7 @@
     <div id="doc">
 
 		<div id="demo">
-			<div class="hd"><h3 class="title">H3 - Title</h3></div>
-			<div class="bd">
-				<p>&nbsp;</p>
-			</div>
+			<h3 class="title">Result:</h3></div>
 		</div>
 
     </div>
@@ -38,14 +34,14 @@
 	<script type="text/javascript">
 		// First Block: using YUI 3.x modules
 		YUI_bootstrap().use('event', 'node', function (Y) {
-		    alert ('First Block: Ready...');
+		    Y.get('#demo').append('<p>YUI3: First Block: Ready...</p>');
 		});
 	</script>
 
 	<script type="text/javascript">
 		// Second Block: combining YUI 3.x modules with a custom module defined in the initialization
 		YUI_bootstrap().use('node', 'dd', 'foo', function (Y) {
-		    alert ('Second Block: Ready...');
+			Y.get('#demo').append('<p>YUI3: Second Block: Ready...</p>');
 		});		
 	</script>
 		
@@ -59,8 +55,9 @@
 				}
 			}
 		}).use('io', 'bar', function (Y) {
-		    alert ('Third Block: Ready...');
+			Y.get('#demo').append('<p>YUI3: Third Block: Ready...</p>');
 		});		
 	</script>
+
 </body>
 </html>

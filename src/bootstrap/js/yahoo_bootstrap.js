@@ -172,8 +172,6 @@
 		 * @return void
 		 */
 		function _initLoader (l) {
-		    var i, m;
-			
 			if (!_loaderObj) {
 				/* creating the loader object for this region */
 				l = l || {};
@@ -242,7 +240,6 @@
 				var a=Array.prototype.slice.call(arguments, 0),
 					callback = a.pop ();
 				_loaderQueue.push (function () {
-					var i;
 					_initLoader(o);
 					_loaderObj.require(a);
 					_loaderObj.insert({
