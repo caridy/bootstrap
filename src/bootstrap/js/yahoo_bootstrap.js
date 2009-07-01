@@ -11,7 +11,8 @@
 		
 	var _config = {modules:{}},
 		_loaderObj = null,
-		_loaderQueue = [];
+		_loaderQueue = [],
+		_loading = false;
 		
 	/**
      * YAHOO_bootstrap function.  If YAHOO_bootstrap is already defined, the
@@ -27,9 +28,6 @@
      *  <li>Global:</li>
      *  <li>------------------------------------------------------------------------</li>
      *  <li>debug: Turn debug statements on or off</li>
-     *  <li>injected: set to true if the yui seed file was dynamically loaded in
-     *  order to bootstrap components relying on the window load event and onDOMReady
-     *  (former injecting on YAHOO_config).</li>
      *  <li>locale: default locale</li>
      *  <li>-------------------------------------------------------------------------</li>
      *  <li>For loader:</li>
@@ -101,6 +99,7 @@
 		 */
 		function _loaderDispatch () {
 			var c;
+			_loading = false;
 			if ((c = _loaderQueue.shift())) {
 				c.call();
 			}
@@ -116,28 +115,24 @@
 		 */
 		function _includeLoader () {
 			var base = _config.base || 'http://yui.yahooapis.com/2.7.0/build/',
-				seed = _config.seed || 'yuiloader/yuiloader-min.js';
+				seed = _config.seed || 'yuiloader/yuiloader-min.js',
+				s = document.createElement('script');
 			// analyzing the seed
 			seed = (seed.indexOf('http')===0?seed:base+seed);
-			// Encapsulation Pattern: Conjuring YUI from thin air (by Chris Heilmann)
-			// more info: http://www.wait-till-i.com/2008/08/02/conjuring-yui-from-thin-air/
-			YAHOO_config = function() {
-			    /* injecting the YUI Loader in the current page */
-			    var s = document.createElement('script');
-			    s.setAttribute('type', 'text/javascript');
-			    s.setAttribute('src', seed);
-			    document.getElementsByTagName('head')[0].appendChild(s);
-			    return {
-			        // true if the library should be dynamically loaded after window.onload.
-			        injecting: !!_config.injected,
-			        listener: function(o) {
-			            // waiting for the loader component
-			            if (o.name === 'get') {
-			                window.setTimeout(_loaderDispatch, 1);
-			            }
-			        }
-			    };
-			}();
+			// more info about this here: http://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/
+		    s.type = "text/javascript";
+		    if (s.readyState){  //IE
+		        s.onreadystatechange = function(){
+		            if (s.readyState == "loaded" || s.readyState == "complete"){
+		                s.onreadystatechange = null;
+		                _loaderDispatch();
+		            }
+		        };
+		    } else {  //Others
+		        s.onload = _loaderDispatch;
+		    }
+		    s.src = seed;
+			document.getElementsByTagName('head')[0].appendChild(s);
 		}
 		
 		/**
@@ -257,10 +252,11 @@
 							(o.onTimeout || function(){}).call();
 						}
 					}, o.type);
+					_loading = true;
 				});
 				// verifying if the loader is ready in the page, if not, it will be 
 				// included automatically and then the process will continue.
-				if (_loaderQueue.length===1) {
+				if ((_loaderQueue.length===1) && !_loading) {
 					((typeof YAHOO == "undefined" || !YAHOO)?_includeLoader():_loaderDispatch());				
 				}
 			}

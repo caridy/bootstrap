@@ -113,25 +113,26 @@
 		 * @return void
 		 */
 		function _includeLoader () {
-			/* injecting the YUI Loader in the current page */
+			// injecting the YUI Loader in the current page
 			var base = _config.base || 'http://yui.yahooapis.com/3.0.0pr2/build/',
 				seed = _config.seed || 'yui/yui-min.js',
-				s = document.createElement('script'),
-				fn = function(){
-					if ((typeof YUI === 'undefined') || !YUI) {
-						// keep waiting...
-						window.setTimeout(fn, 50);
-					} else {	  
-						// YUI is ready...
-						window.setTimeout(_loaderDispatch, 1);
-					}
-			    };
-		    s.setAttribute('type', 'text/javascript');
-			// analyzing the seed
+				s = document.createElement('script');
+		    // analyzing the seed
 			seed = (seed.indexOf('http')===0?seed:base+seed);
-		    s.setAttribute('src', seed);
+			// more info about this here: http://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/
+		    s.type = "text/javascript";
+		    if (s.readyState){  //IE
+		        s.onreadystatechange = function(){
+		            if (s.readyState == "loaded" || s.readyState == "complete"){
+		                s.onreadystatechange = null;
+		                _loaderDispatch();
+		            }
+		        };
+		    } else {  //Others
+		        s.onload = _loaderDispatch;
+		    }
+		    s.src = seed;
 		    document.getElementsByTagName('head')[0].appendChild(s);
-			fn();
 		}
 		
 		/**

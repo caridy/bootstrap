@@ -162,25 +162,26 @@
 <span class="c">		 * @return void</span>
 <span class="c">		 */</span>
 		<span class="kd">function</span> <span class="nx">_includeLoader</span> <span class="p">()</span> <span class="p">{</span>
-			<span class="c">/* injecting the YUI Loader in the current page */</span>
+			<span class="c">// injecting the YUI Loader in the current page</span>
 			<span class="kd">var</span> <span class="nx">base</span> <span class="o">=</span> <span class="nx">_config</span><span class="p">.</span><span class="nx">base</span> <span class="o">||</span> <span class="s1">&#39;http://yui.yahooapis.com/3.0.0pr2/build/&#39;</span><span class="o">,</span>
 				<span class="nx">seed</span> <span class="o">=</span> <span class="nx">_config</span><span class="p">.</span><span class="nx">seed</span> <span class="o">||</span> <span class="s1">&#39;yui/yui-min.js&#39;</span><span class="o">,</span>
-				<span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">)</span><span class="o">,</span>
-				<span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
-					<span class="k">if</span> <span class="p">((</span><span class="k">typeof</span> <span class="nx">YUI</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="nx">YUI</span><span class="p">)</span> <span class="p">{</span>
-						<span class="c">// keep waiting...</span>
-						<span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">fn</span><span class="o">,</span> <span class="mi">50</span><span class="p">);</span>
-					<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>	  
-						<span class="c">// YUI is ready...</span>
-						<span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">_loaderDispatch</span><span class="o">,</span> <span class="mi">1</span><span class="p">);</span>
-					<span class="p">}</span>
-			    <span class="p">};</span>
-		    <span class="nx">s</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="o">,</span> <span class="s1">&#39;text/javascript&#39;</span><span class="p">);</span>
-			<span class="c">// analyzing the seed</span>
+				<span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
+		    <span class="c">// analyzing the seed</span>
 			<span class="nx">seed</span> <span class="o">=</span> <span class="p">(</span><span class="nx">seed</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">)</span><span class="o">===</span><span class="mi">0</span><span class="o">?</span><span class="nx">seed</span><span class="o">:</span><span class="nx">base</span><span class="o">+</span><span class="nx">seed</span><span class="p">);</span>
-		    <span class="nx">s</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="o">,</span> <span class="nx">seed</span><span class="p">);</span>
+			<span class="c">// more info about this here: http://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/</span>
+		    <span class="nx">s</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s2">&quot;text/javascript&quot;</span><span class="o">;</span>
+		    <span class="k">if</span> <span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span><span class="p">){</span>  <span class="c">//IE</span>
+		        <span class="nx">s</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+		            <span class="k">if</span> <span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="s2">&quot;loaded&quot;</span> <span class="o">||</span> <span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">){</span>
+		                <span class="nx">s</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+		                <span class="nx">_loaderDispatch</span><span class="p">();</span>
+		            <span class="p">}</span>
+		        <span class="p">};</span>
+		    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  <span class="c">//Others</span>
+		        <span class="nx">s</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="nx">_loaderDispatch</span><span class="o">;</span>
+		    <span class="p">}</span>
+		    <span class="nx">s</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">seed</span><span class="o">;</span>
 		    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;head&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
-			<span class="nx">fn</span><span class="p">();</span>
 		<span class="p">}</span>
 		
 		<span class="c">/**</span>

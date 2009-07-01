@@ -11,7 +11,8 @@
 		
 	<span class="kd">var</span> <span class="nx">_config</span> <span class="o">=</span> <span class="p">{</span><span class="nx">modules</span><span class="o">:</span><span class="p">{}}</span><span class="o">,</span>
 		<span class="nx">_loaderObj</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span>
-		<span class="nx">_loaderQueue</span> <span class="o">=</span> <span class="p">[];</span>
+		<span class="nx">_loaderQueue</span> <span class="o">=</span> <span class="p">[]</span><span class="o">,</span>
+		<span class="nx">_loading</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
 		
 	<span class="c">/**</span>
 <span class="c">     * YAHOO_bootstrap function.  If YAHOO_bootstrap is already defined, the</span>
@@ -27,9 +28,6 @@
 <span class="c">     *  &lt;li&gt;Global:&lt;/li&gt;</span>
 <span class="c">     *  &lt;li&gt;------------------------------------------------------------------------&lt;/li&gt;</span>
 <span class="c">     *  &lt;li&gt;debug: Turn debug statements on or off&lt;/li&gt;</span>
-<span class="c">     *  &lt;li&gt;injected: set to true if the yui seed file was dynamically loaded in</span>
-<span class="c">     *  order to bootstrap components relying on the window load event and onDOMReady</span>
-<span class="c">     *  (former injecting on YAHOO_config).&lt;/li&gt;</span>
 <span class="c">     *  &lt;li&gt;locale: default locale&lt;/li&gt;</span>
 <span class="c">     *  &lt;li&gt;-------------------------------------------------------------------------&lt;/li&gt;</span>
 <span class="c">     *  &lt;li&gt;For loader:&lt;/li&gt;</span>
@@ -101,6 +99,7 @@
 <span class="c">		 */</span>
 		<span class="kd">function</span> <span class="nx">_loaderDispatch</span> <span class="p">()</span> <span class="p">{</span>
 			<span class="kd">var</span> <span class="nx">c</span><span class="o">;</span>
+			<span class="nx">_loading</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
 			<span class="k">if</span> <span class="p">((</span><span class="nx">c</span> <span class="o">=</span> <span class="nx">_loaderQueue</span><span class="p">.</span><span class="nx">shift</span><span class="p">()))</span> <span class="p">{</span>
 				<span class="nx">c</span><span class="p">.</span><span class="nx">call</span><span class="p">();</span>
 			<span class="p">}</span>
@@ -116,28 +115,24 @@
 <span class="c">		 */</span>
 		<span class="kd">function</span> <span class="nx">_includeLoader</span> <span class="p">()</span> <span class="p">{</span>
 			<span class="kd">var</span> <span class="nx">base</span> <span class="o">=</span> <span class="nx">_config</span><span class="p">.</span><span class="nx">base</span> <span class="o">||</span> <span class="s1">&#39;http://yui.yahooapis.com/2.7.0/build/&#39;</span><span class="o">,</span>
-				<span class="nx">seed</span> <span class="o">=</span> <span class="nx">_config</span><span class="p">.</span><span class="nx">seed</span> <span class="o">||</span> <span class="s1">&#39;yuiloader/yuiloader-min.js&#39;</span><span class="o">;</span>
+				<span class="nx">seed</span> <span class="o">=</span> <span class="nx">_config</span><span class="p">.</span><span class="nx">seed</span> <span class="o">||</span> <span class="s1">&#39;yuiloader/yuiloader-min.js&#39;</span><span class="o">,</span>
+				<span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
 			<span class="c">// analyzing the seed</span>
 			<span class="nx">seed</span> <span class="o">=</span> <span class="p">(</span><span class="nx">seed</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">)</span><span class="o">===</span><span class="mi">0</span><span class="o">?</span><span class="nx">seed</span><span class="o">:</span><span class="nx">base</span><span class="o">+</span><span class="nx">seed</span><span class="p">);</span>
-			<span class="c">// Encapsulation Pattern: Conjuring YUI from thin air (by Chris Heilmann)</span>
-			<span class="c">// more info: http://www.wait-till-i.com/2008/08/02/conjuring-yui-from-thin-air/</span>
-			<span class="nx">YAHOO_config</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-			    <span class="c">/* injecting the YUI Loader in the current page */</span>
-			    <span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">);</span>
-			    <span class="nx">s</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="o">,</span> <span class="s1">&#39;text/javascript&#39;</span><span class="p">);</span>
-			    <span class="nx">s</span><span class="p">.</span><span class="nx">setAttribute</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="o">,</span> <span class="nx">seed</span><span class="p">);</span>
-			    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;head&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
-			    <span class="k">return</span> <span class="p">{</span>
-			        <span class="c">// true if the library should be dynamically loaded after window.onload.</span>
-			        <span class="nx">injecting</span><span class="o">:</span> <span class="o">!!</span><span class="nx">_config</span><span class="p">.</span><span class="nx">injected</span><span class="o">,</span>
-			        <span class="nx">listener</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
-			            <span class="c">// waiting for the loader component</span>
-			            <span class="k">if</span> <span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">name</span> <span class="o">===</span> <span class="s1">&#39;get&#39;</span><span class="p">)</span> <span class="p">{</span>
-			                <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">_loaderDispatch</span><span class="o">,</span> <span class="mi">1</span><span class="p">);</span>
-			            <span class="p">}</span>
-			        <span class="p">}</span>
-			    <span class="p">};</span>
-			<span class="p">}();</span>
+			<span class="c">// more info about this here: http://www.nczonline.net/blog/2009/06/23/loading-javascript-without-blocking/</span>
+		    <span class="nx">s</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="s2">&quot;text/javascript&quot;</span><span class="o">;</span>
+		    <span class="k">if</span> <span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span><span class="p">){</span>  <span class="c">//IE</span>
+		        <span class="nx">s</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span>
+		            <span class="k">if</span> <span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="s2">&quot;loaded&quot;</span> <span class="o">||</span> <span class="nx">s</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="s2">&quot;complete&quot;</span><span class="p">){</span>
+		                <span class="nx">s</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+		                <span class="nx">_loaderDispatch</span><span class="p">();</span>
+		            <span class="p">}</span>
+		        <span class="p">};</span>
+		    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  <span class="c">//Others</span>
+		        <span class="nx">s</span><span class="p">.</span><span class="nx">onload</span> <span class="o">=</span> <span class="nx">_loaderDispatch</span><span class="o">;</span>
+		    <span class="p">}</span>
+		    <span class="nx">s</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span> <span class="nx">seed</span><span class="o">;</span>
+			<span class="nb">document</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;head&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
 		<span class="p">}</span>
 		
 		<span class="c">/**</span>
@@ -257,10 +252,11 @@
 							<span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">onTimeout</span> <span class="o">||</span> <span class="kd">function</span><span class="p">(){}).</span><span class="nx">call</span><span class="p">();</span>
 						<span class="p">}</span>
 					<span class="p">}</span><span class="o">,</span> <span class="nx">o</span><span class="p">.</span><span class="nx">type</span><span class="p">);</span>
+					<span class="nx">_loading</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
 				<span class="p">});</span>
 				<span class="c">// verifying if the loader is ready in the page, if not, it will be </span>
 				<span class="c">// included automatically and then the process will continue.</span>
-				<span class="k">if</span> <span class="p">(</span><span class="nx">_loaderQueue</span><span class="p">.</span><span class="nx">length</span><span class="o">===</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">if</span> <span class="p">((</span><span class="nx">_loaderQueue</span><span class="p">.</span><span class="nx">length</span><span class="o">===</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">_loading</span><span class="p">)</span> <span class="p">{</span>
 					<span class="p">((</span><span class="k">typeof</span> <span class="nx">YAHOO</span> <span class="o">==</span> <span class="s2">&quot;undefined&quot;</span> <span class="o">||</span> <span class="o">!</span><span class="nx">YAHOO</span><span class="p">)</span><span class="o">?</span><span class="nx">_includeLoader</span><span class="p">()</span><span class="o">:</span><span class="nx">_loaderDispatch</span><span class="p">());</span>				
 				<span class="p">}</span>
 			<span class="p">}</span>
